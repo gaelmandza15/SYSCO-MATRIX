@@ -23,6 +23,10 @@ import {
     Check,
     FileType,
     XCircle,
+    Camera,
+    History,
+    Upload,
+    Pencil,
 } from 'lucide';
 
 /**
@@ -57,6 +61,10 @@ const ICONS = {
     Check,
     FileType,
     XCircle,
+    Camera,
+    History,
+    Upload,
+    Pencil,
 };
 
 /**

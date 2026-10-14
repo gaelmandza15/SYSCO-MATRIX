@@ -3,6 +3,7 @@ import { dbClient, pickBalanceFile, readFileAsText } from '../db/client.js';
 import { formatFCFA } from '../lib/format.js';
 import { renderIcons } from '../ui/icons.js';
 import { showToast } from '../ui/toast.js';
+import { dialogConfirm } from '../ui/dialog.js';
 import { renderDashboard } from './dashboard.js';
 
 /** Échappement HTML minimal pour les données issues de fichiers externes. */
@@ -231,7 +232,13 @@ export function initBalance() {
 
     document.getElementById('btn-add-account')?.addEventListener('click', () => openAccountModal());
     document.getElementById('btn-clear')?.addEventListener('click', async () => {
-        if (confirm('Voulez-vous vraiment réinitialiser toute la balance ?\n\nUn point de restauration sera enregistré automatiquement avant : vous pourrez revenir en arrière depuis « Sauvegardes & Historique ».')) {
+        const ok = await dialogConfirm({
+            title: 'Réinitialiser toute la balance ?',
+            message: 'Tous les comptes saisis ou importés seront supprimés. Un point de restauration sera enregistré automatiquement avant : vous pourrez revenir en arrière depuis « Sauvegardes & Historique ».',
+            okLabel: 'Réinitialiser',
+            danger: true,
+        });
+        if (ok) {
             try {
                 await clearAccounts();
                 renderBalanceTable();

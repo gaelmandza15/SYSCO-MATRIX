@@ -2,6 +2,7 @@ import { state, createSnapshot, listSnapshots, restoreSnapshot, deleteSnapshot }
 import { dbClient, pickAndExportBackup, pickBackupFile, readFileAsText } from '../db/client.js';
 import { renderIcons } from '../ui/icons.js';
 import { showToast } from '../ui/toast.js';
+import { dialogPrompt, dialogConfirm } from '../ui/dialog.js';
 
 /** Échappement HTML pour les libellés stockés (labels de snapshots). */
 function esc(s) {
@@ -50,7 +51,12 @@ export function initBackup() {
 
     document.getElementById('btn-snapshot-create')?.addEventListener('click', async () => {
         try {
-            const label = prompt('Nom du point de restauration :', 'Point de restauration manuel');
+            const label = await dialogPrompt({
+                title: 'Créer un point de restauration',
+                message: 'Un instantané complet de la balance et des paramètres sera enregistré.',
+                value: 'Point de restauration manuel',
+                placeholder: 'Nom du point de restauration',
+            });
             if (label === null) return;
             await createSnapshot(label.trim() || 'Point de restauration manuel');
             showToast('Point de restauration créé.');
@@ -179,10 +185,16 @@ export async function renderSnapshots() {
         btn.addEventListener('click', async () => {
             const id = Number(btn.getAttribute('data-restore'));
             const meta = metas.find((x) => x.id === id);
-            const ok = confirm(
-                `Revenir au point « ${meta?.label ?? id} » (${meta?.created_at ?? ''}, ${meta?.account_count ?? '?'} comptes) ?\n\n` +
-                'La balance et les paramètres actuels seront remplacés. Un nouveau point de restauration sera enregistré avant : vous pourrez annuler cette opération.'
-            );
+            const ok = await dialogConfirm({
+                title: 'Revenir à ce point de restauration ?',
+                message: 'La balance et les paramètres actuels seront remplacés. Un nouveau point sera enregistré avant : l\'opération reste annulable.',
+                lines: [
+                    `Point : ${meta?.label ?? id}`,
+                    `Date : ${meta?.created_at ?? '?'}`,
+                    `Comptes : ${meta?.account_count ?? '?'}`,
+                ],
+                okLabel: 'Restaurer',
+            });
             if (!ok) return;
             try {
                 await restoreSnapshot(id);
@@ -198,7 +210,13 @@ export async function renderSnapshots() {
     panel.querySelectorAll('[data-delete-snap]').forEach((btn) => {
         btn.addEventListener('click', async () => {
             const id = Number(btn.getAttribute('data-delete-snap'));
-            if (!confirm('Supprimer définitivement ce point de restauration ?')) return;
+            const ok = await dialogConfirm({
+                title: 'Supprimer ce point de restauration ?',
+                message: 'Cette action est définitive : ce point disparaîtra de l\'historique.',
+                okLabel: 'Supprimer',
+                danger: true,
+            });
+            if (!ok) return;
             try {
                 await deleteSnapshot(id);
                 await renderSnapshots();
