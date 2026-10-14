@@ -1,5 +1,6 @@
 use rusqlite::params;
 
+use crate::backup::{self, SnapshotMeta};
 use crate::db;
 use crate::export;
 use crate::import;
@@ -89,9 +90,17 @@ pub fn parse_balance_file(path: String) -> Result<Vec<ImportRow>, String> {
 /// - `replace` à `true` : la balance est vidée avant l'import ;
 /// - sinon les lignes sont fusionnées : si un code existe déjà, son
 ///   intitulé et ses soldes sont mis à jour, sinon le compte est créé.
+///
+/// Un point de restauration est enregistré avant toute écriture afin de
+/// pouvoir revenir en arrière en cas d'erreur d'import.
 #[tauri::command]
 pub fn import_accounts(rows: Vec<ImportRow>, replace: bool) -> Result<Vec<Account>, String> {
     let mut conn = db::connection().map_err(|e| e.to_string())?;
+    backup::create_snapshot(if replace {
+        "Avant import (remplacement)"
+    } else {
+        "Avant import (fusion)"
+    })?;
     let tx = conn.transaction().map_err(|e| e.to_string())?;
     if replace {
         tx.execute("DELETE FROM accounts", [])
@@ -120,10 +129,54 @@ pub fn import_accounts(rows: Vec<ImportRow>, replace: bool) -> Result<Vec<Accoun
     list_all(&conn)
 }
 
-/// Vide entièrement la balance.
+/// Enregistre un point de restauration (snapshot) de l'état courant.
+#[tauri::command]
+pub fn create_snapshot(label: String) -> Result<i64, String> {
+    backup::create_snapshot(&label)
+}
+
+/// Liste les points de restauration disponibles (les plus récents d'abord).
+#[tauri::command]
+pub fn list_snapshots() -> Result<Vec<SnapshotMeta>, String> {
+    backup::list_snapshots()
+}
+
+/// Restaure l'état (balance + paramètres) d'un point de restauration.
+/// Sauvegarde préalablement l'état courant pour permettre un retour arrière.
+#[tauri::command]
+pub fn restore_snapshot(id: i64) -> Result<serde_json::Value, String> {
+    backup::create_snapshot("Avant restauration")?;
+    backup::restore_snapshot(id)
+}
+
+/// Supprime un point de restauration.
+#[tauri::command]
+pub fn delete_snapshot(id: i64) -> Result<(), String> {
+    backup::delete_snapshot(id)
+}
+
+/// Exporte l'historique des sauvegardes vers un fichier JSON.
+#[tauri::command]
+pub fn export_backup(path: String) -> Result<String, String> {
+    backup::export_backup(&path)
+}
+
+/// Importe des sauvegardes depuis un fichier JSON exporté par `export_backup`.
+#[tauri::command]
+pub fn import_backup(path: String) -> Result<usize, String> {
+    backup::import_backup(&path)
+}
+
+/// Vide entièrement la balance (avec point de restauration automatique).
 #[tauri::command]
 pub fn clear_accounts() -> Result<Vec<Account>, String> {
     let conn = db::connection().map_err(|e| e.to_string())?;
+    let count: i64 = conn
+        .query_row("SELECT COUNT(*) FROM accounts", [], |r| r.get(0))
+        .unwrap_or(0);
+    if count > 0 {
+        backup::create_snapshot("Avant réinitialisation")?;
+    }
     conn.execute("DELETE FROM accounts", [])
         .map_err(|e| e.to_string())?;
     list_all(&conn)

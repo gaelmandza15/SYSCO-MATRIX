@@ -79,3 +79,36 @@ export async function saveSettings(settings) {
     await dbClient.saveSettings(settings);
     notify();
 }
+
+/* --------------------- Sauvegardes / historique --------------------- */
+
+/** Enregistre un point de restauration manuel de l'état courant. */
+export async function createSnapshot(label = 'Point de restauration') {
+    return dbClient.createSnapshot(label);
+}
+
+/** Liste les points de restauration disponibles (les plus récents d'abord). */
+export async function listSnapshots() {
+    return dbClient.listSnapshots();
+}
+
+/**
+ * Restaure l'état (balance + paramètres) enregistré dans le snapshot `id`.
+ * Le backend enregistre préalablement l'état courant dans l'historique,
+ * ce qui rend la manipulation réversible.
+ */
+export async function restoreSnapshot(id) {
+    const result = await dbClient.restoreSnapshot(id);
+    if (result && Array.isArray(result.accounts)) {
+        state.accounts = result.accounts;
+        if (result.settings) state.settings = { ...result.settings };
+    } else {
+        await Promise.all([loadAccounts(), loadSettings()]);
+    }
+    notify();
+}
+
+/** Supprime un point de restauration. */
+export async function deleteSnapshot(id) {
+    return dbClient.deleteSnapshot(id);
+}

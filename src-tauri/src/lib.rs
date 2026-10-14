@@ -1,4 +1,5 @@
 mod accounting;
+mod backup;
 mod commands;
 mod db;
 mod dsf;
@@ -44,6 +45,12 @@ pub fn run() {
             commands::save_settings,
             commands::export_dsf_report,
             commands::export_dsf_pdf,
+            commands::create_snapshot,
+            commands::list_snapshots,
+            commands::restore_snapshot,
+            commands::delete_snapshot,
+            commands::export_backup,
+            commands::import_backup,
         ])
         .run(tauri::generate_context!())
         .expect("error while running SYSC-MATRIX");

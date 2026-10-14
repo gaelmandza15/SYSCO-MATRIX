@@ -2,6 +2,7 @@ import { renderMatrixTable } from '../controllers/matrix.js';
 import { renderControls } from '../controllers/controls.js';
 import { renderNotes } from '../controllers/notes.js';
 import { renderDashboard } from '../controllers/dashboard.js';
+import { renderSnapshots } from '../controllers/backup.js';
 
 const TITLES = {
     dashboard: 'Tableau de Bord & Synthèse',
@@ -9,6 +10,7 @@ const TITLES = {
     matrix: "Matrice d'Intégration DSF (Système Normal)",
     controls: "Contrôles d'Équilibre et Cohérence",
     notes: 'Notes Annexes Automatiques',
+    backup: 'Sauvegardes & Historique',
     settings: 'Paramètres & Règles',
 };
 
@@ -27,5 +29,6 @@ export function switchTab(tabId) {
     if (tabId === 'matrix') renderMatrixTable();
     if (tabId === 'controls') renderControls();
     if (tabId === 'notes') renderNotes();
+    if (tabId === 'backup') renderSnapshots();
     renderDashboard();
 }

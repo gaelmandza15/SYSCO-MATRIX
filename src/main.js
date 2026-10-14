@@ -13,6 +13,7 @@ import { initMatrix } from './controllers/matrix.js';
 import { initControls } from './controllers/controls.js';
 import { initNotes } from './controllers/notes.js';
 import { initSettings } from './controllers/settings.js';
+import { initBackup } from './controllers/backup.js';
 import { initAccountsModal } from './controllers/accounts.js';
 import { runExportExcel, runExportPdf } from './controllers/export.js';
 
@@ -62,6 +63,7 @@ async function bootstrap() {
     initControls();
     initNotes();
     initSettings();
+    initBackup();
     initAccountsModal();
 
     bindGlobalEvents();

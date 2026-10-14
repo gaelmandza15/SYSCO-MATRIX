@@ -23,6 +23,7 @@ rust_xlsxwriter = "0.79"
 printpdf = "0.7"
 zip = { version = "2", default-features = false, features = ["deflate"] }
 quick-xml = "0.36"
+chrono = "0.4"
 
 [features]
 default = ["custom-protocol"]

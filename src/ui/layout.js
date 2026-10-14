@@ -36,6 +36,10 @@ export function appLayout() {
                 <i data-lucide="file-text" class="w-4 h-4 text-neutral-500"></i>
                 <span>Notes Annexes Automatiques</span>
             </button>
+            <button data-nav="backup" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors">
+                <i data-lucide="history" class="w-4 h-4 text-neutral-500"></i>
+                <span>Sauvegardes & Historique</span>
+            </button>
             <button data-nav="settings" class="nav-btn w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors">
                 <i data-lucide="sliders" class="w-4 h-4 text-neutral-500"></i>
                 <span>Paramètres & Règles</span>
@@ -81,6 +85,7 @@ export function appLayout() {
             <div id="tab-matrix" class="space-y-6 max-w-7xl mx-auto tab-content hidden"><!-- matrix --></div>
             <div id="tab-controls" class="space-y-6 max-w-7xl mx-auto tab-content hidden"><!-- controls --></div>
             <div id="tab-notes" class="space-y-6 max-w-7xl mx-auto tab-content hidden"><!-- notes --></div>
+            <div id="tab-backup" class="space-y-6 max-w-7xl mx-auto tab-content hidden"><!-- backup --></div>
             <div id="tab-settings" class="space-y-6 max-w-7xl mx-auto tab-content hidden"><!-- settings --></div>
         </div>
     </main>

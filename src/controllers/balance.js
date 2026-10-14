@@ -231,10 +231,14 @@ export function initBalance() {
 
     document.getElementById('btn-add-account')?.addEventListener('click', () => openAccountModal());
     document.getElementById('btn-clear')?.addEventListener('click', async () => {
-        if (confirm('Voulez-vous vraiment réinitialiser toute la balance ?')) {
-            await clearAccounts();
-            renderBalanceTable();
-            showToast('Balance réinitialisée.');
+        if (confirm('Voulez-vous vraiment réinitialiser toute la balance ?\n\nUn point de restauration sera enregistré automatiquement avant : vous pourrez revenir en arrière depuis « Sauvegardes & Historique ».')) {
+            try {
+                await clearAccounts();
+                renderBalanceTable();
+                showToast('Balance réinitialisée. Réversible via Sauvegardes & Historique.');
+            } catch (err) {
+                showToast(`Réinitialisation échouée : ${err.message ?? err}`);
+            }
         }
     });
 

@@ -30,7 +30,9 @@ fn migrate(conn: &Connection) -> rusqlite::Result<()> {
             value TEXT NOT NULL DEFAULT ''
         );
         "#,
-    )
+    )?;
+    // Table des points de restauration (historique / backups).
+    crate::backup::migrate(conn)
 }
 
 /// Retourne une connexion à la base, à partir de l'état global.
