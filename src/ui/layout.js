@@ -2,12 +2,14 @@
  * Gabarit statique de l'application (sidebar, header, onglets, modal, toast).
  * Les zones dynamiques sont remplies par les contrôleurs.
  */
+import logoUrl from '../assets/img/logo.png';
+
 export function appLayout() {
     return `
     <aside id="sidebar" class="w-80 bg-white border-r border-neutral-200 flex flex-col z-20 transition-all duration-300">
         <div class="p-6 border-b border-neutral-100 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="w-9 h-9 rounded-xl bg-neutral-900 text-white flex items-center justify-center font-semibold text-sm">SM</div>
+                <img src="${logoUrl}" alt="Logo SYSC-MATRIX" class="w-10 h-10 rounded-full object-cover ring-1 ring-neutral-200 select-none" draggable="false" />
                 <div>
                     <h1 class="font-semibold text-sm tracking-tight text-neutral-900">SYSC-MATRIX</h1>
                     <p class="text-xs text-neutral-500">SYSCOHADA Révisé • Système Normal</p>
