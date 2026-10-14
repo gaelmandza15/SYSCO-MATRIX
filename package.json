@@ -1,0 +1,25 @@
+{
+  "name": "sysc-matrix",
+  "version": "1.0.0",
+  "description": "SYSC-MATRIX — Matrice d'intégration Balance → DSF SYSCOHADA Révisé (Tauri + SQLite)",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.0.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14",
+    "vite": "^5.4.10"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.0.0",
+    "@tauri-apps/plugin-dialog": "^2.0.0",
+    "@tauri-apps/plugin-opener": "^2.0.0",
+    "lucide": "^0.454.0"
+  }
+}
