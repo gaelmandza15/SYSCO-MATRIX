@@ -43,6 +43,14 @@ function bindGlobalEvents() {
 
     // Boutons du header.
     document.getElementById('btn-sample')?.addEventListener('click', async () => {
+        const accounts = await store.getAccounts();
+        if (accounts.length > 0) {
+            const ok = window.confirm(
+                'Charger la balance témoin remplacera DÉFINITIVEMENT votre balance actuelle ('
+                + accounts.length + ' compte(s)).\n\nContinuer ?'
+            );
+            if (!ok) return;
+        }
         await store.loadSampleData();
         renderBalanceTable();
         renderDashboard();
