@@ -1,7 +1,7 @@
-# SYSC-MATRIX
+# SYSCO-MATRIX
 
-Application de bureau pour la **matrice d'intégration Balance → DSF** selon le
-**SYSCOHADA Révisé** (Système Normal, espace OHADA).
+Application de bureau pourcomptabilité et de préparation des états financiers spécifiquement conçu pour 
+les entreprises de la zone OHADA (Afrique de l'Ouest et Centrale).
 
 Passage automatisé de la balance générale aux états financiers normalisés
 (Bilan, Compte de Résultat), avec contrôles d'équilibre, notes annexes et
