@@ -2,7 +2,8 @@ use rusqlite::params;
 
 use crate::db;
 use crate::export;
-use crate::models::{Account, AccountInput, Settings};
+use crate::import;
+use crate::models::{Account, AccountInput, AccountUpdate, ImportRow, Settings};
 use crate::pdf;
 
 // Balance témoin SYSCOHADA — jeu d'exemple ÉQUILIBRÉ et cohérent.
@@ -89,6 +90,68 @@ pub fn delete_account(id: i64) -> Result<Vec<Account>, String> {
     let conn = db::connection().map_err(|e| e.to_string())?;
     conn.execute("DELETE FROM accounts WHERE id = ?1", params![id])
         .map_err(|e| e.to_string())?;
+    list_all(&conn)
+}
+
+/// Modifie un compte existant (code, intitulé, soldes) en place.
+#[tauri::command]
+pub fn update_account(input: AccountUpdate) -> Result<Vec<Account>, String> {
+    let conn = db::connection().map_err(|e| e.to_string())?;
+    let affected = conn
+        .execute(
+            "UPDATE accounts SET code = ?2, name = ?3, debit = ?4, credit = ?5 WHERE id = ?1",
+            params![input.id, input.code, input.name, input.debit, input.credit],
+        )
+        .map_err(|e| e.to_string())?;
+    if affected == 0 {
+        return Err(format!("Aucun compte avec l'identifiant {}.", input.id));
+    }
+    list_all(&conn)
+}
+
+/// Lit un fichier de balance (CSV, TSV ou .xlsx) choisi par l'utilisateur
+/// et retourne les lignes analysées, sans écrire en base.
+///
+/// Le frontend affiche une prévisualisation, puis confirme via
+/// `import_accounts`.
+#[tauri::command]
+pub fn parse_balance_file(path: String) -> Result<Vec<ImportRow>, String> {
+    import::parse_balance_file(&path)
+}
+
+/// Importe des lignes de balance (issues d'un CSV ou d'un tableur).
+///
+/// - `replace` à `true` : la balance est vidée avant l'import ;
+/// - sinon les lignes sont fusionnées : si un code existe déjà, son
+///   intitulé et ses soldes sont mis à jour, sinon le compte est créé.
+#[tauri::command]
+pub fn import_accounts(rows: Vec<ImportRow>, replace: bool) -> Result<Vec<Account>, String> {
+    let mut conn = db::connection().map_err(|e| e.to_string())?;
+    let tx = conn.transaction().map_err(|e| e.to_string())?;
+    if replace {
+        tx.execute("DELETE FROM accounts", [])
+            .map_err(|e| e.to_string())?;
+    }
+    for row in rows {
+        let code = row.code.trim();
+        if code.is_empty() {
+            continue;
+        }
+        let updated = tx
+            .execute(
+                "UPDATE accounts SET name = ?2, debit = ?3, credit = ?4 WHERE code = ?1",
+                params![code, row.name, row.debit, row.credit],
+            )
+            .map_err(|e| e.to_string())?;
+        if updated == 0 {
+            tx.execute(
+                "INSERT INTO accounts (code, name, debit, credit) VALUES (?1, ?2, ?3, ?4)",
+                params![code, row.name, row.debit, row.credit],
+            )
+            .map_err(|e| e.to_string())?;
+        }
+    }
+    tx.commit().map_err(|e| e.to_string())?;
     list_all(&conn)
 }
 

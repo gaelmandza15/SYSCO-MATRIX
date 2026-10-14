@@ -49,6 +49,21 @@ export async function addAccount(account) {
     notify();
 }
 
+export async function updateAccount(account) {
+    state.accounts = await dbClient.updateAccount(account);
+    notify();
+}
+
+/**
+ * Importe des lignes de balance (CSV ou tableur).
+ * @param {{code:string,name:string,debit:number,credit:number}[]} rows
+ * @param {boolean} replace true = remplace toute la balance, false = fusionne par code.
+ */
+export async function importAccounts(rows, replace = false) {
+    state.accounts = await dbClient.importAccounts(rows, replace);
+    notify();
+}
+
 export async function deleteAccount(id) {
     state.accounts = await dbClient.deleteAccount(id);
     notify();

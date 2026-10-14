@@ -3,6 +3,7 @@ mod commands;
 mod db;
 mod dsf;
 mod export;
+mod import;
 mod models;
 mod pdf;
 
@@ -34,6 +35,9 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::get_accounts,
             commands::add_account,
+            commands::update_account,
+            commands::parse_balance_file,
+            commands::import_accounts,
             commands::delete_account,
             commands::clear_accounts,
             commands::load_sample_data,

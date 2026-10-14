@@ -46,11 +46,11 @@ export function appLayout() {
             <div class="bg-neutral-50 p-3.5 rounded-2xl border border-neutral-200/60">
                 <div class="flex items-center justify-between mb-1">
                     <span class="text-xs font-medium text-neutral-600">Exercice Comptable</span>
-                    <span id="sidebar-year" class="text-xs font-semibold text-neutral-900">2026</span>
+                    <span id="sidebar-year" class="text-xs font-semibold text-neutral-900"></span>
                 </div>
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-medium text-neutral-600">Devise</span>
-                    <span id="sidebar-currency" class="text-xs font-semibold text-neutral-900">FCFA (XOF/XAF)</span>
+                    <span id="sidebar-currency" class="text-xs font-semibold text-neutral-900"></span>
                 </div>
             </div>
         </div>

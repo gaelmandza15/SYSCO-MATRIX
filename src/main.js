@@ -6,6 +6,7 @@ import { switchTab } from './ui/navigation.js';
 import { showToast } from './ui/toast.js';
 
 import * as store from './state/store.js';
+import { fiscalYear, currencyLabel } from './lib/format.js';
 
 import { initDashboard, renderDashboard } from './controllers/dashboard.js';
 import { initBalance, renderBalanceTable } from './controllers/balance.js';
@@ -19,6 +20,19 @@ import { runExportExcel, runExportPdf } from './controllers/export.js';
 function mountLayout() {
     const app = document.getElementById('app');
     app.innerHTML = appLayout();
+}
+
+/**
+ * Année et devise de la sidebar dérivées des paramètres (exercice clos,
+ * pays OHADA) — plus rien de codé en dur. Rappelée à chaque changement
+ * de paramètres grâce à l'abonnement au store.
+ */
+function renderSidebarInfo() {
+    const s = store.state.settings;
+    const yearEl = document.getElementById('sidebar-year');
+    const curEl = document.getElementById('sidebar-currency');
+    if (yearEl) yearEl.textContent = String(fiscalYear(s.closing_date));
+    if (curEl) curEl.textContent = currencyLabel(s.country);
 }
 
 function bindGlobalEvents() {
@@ -47,6 +61,8 @@ function bindGlobalEvents() {
 
 async function bootstrap() {
     mountLayout();
+    renderSidebarInfo();
+    store.subscribe(renderSidebarInfo);
 
     // Initialiser chaque onglet (template + écouteurs).
     initDashboard();

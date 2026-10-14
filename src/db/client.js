@@ -1,5 +1,6 @@
 import { invoke as tauriInvoke, isTauri } from '@tauri-apps/api/core';
 import { save } from '@tauri-apps/plugin-dialog';
+import { open as openDialog } from '@tauri-apps/plugin-dialog';
 import { openPath } from '@tauri-apps/plugin-opener';
 
 /**
@@ -53,6 +54,26 @@ function invokeMemory(cmd, args = {}) {
         case 'add_account':
             m.accounts.push({ id: m.nextId++, ...args.input });
             return [...m.accounts];
+        case 'update_account': {
+            const idx = m.accounts.findIndex((a) => a.id === args.input.id);
+            if (idx === -1) throw new Error(`Aucun compte avec l'identifiant ${args.input.id}.`);
+            m.accounts[idx] = { ...m.accounts[idx], ...args.input };
+            return [...m.accounts];
+        }
+        case 'import_accounts': {
+            if (args.replace) m.accounts = [];
+            for (const row of args.rows) {
+                const code = String(row.code ?? '').trim();
+                if (!code) continue;
+                const idx = m.accounts.findIndex((a) => a.code === code);
+                if (idx >= 0) {
+                    m.accounts[idx] = { ...m.accounts[idx], name: row.name, debit: row.debit, credit: row.credit };
+                } else {
+                    m.accounts.push({ id: m.nextId++, code, name: row.name, debit: row.debit, credit: row.credit });
+                }
+            }
+            return [...m.accounts];
+        }
         case 'delete_account':
             m.accounts = m.accounts.filter((a) => a.id !== args.id);
             return [...m.accounts];
@@ -88,8 +109,11 @@ async function invoke(cmd, args) {
 
 export const dbClient = {
     isTauri: () => useTauri,
+    parseBalanceFile: (path) => invoke('parse_balance_file', { path }),
     getAccounts: () => invoke('get_accounts'),
     addAccount: (account) => invoke('add_account', { input: account }),
+    updateAccount: (account) => invoke('update_account', { input: account }),
+    importAccounts: (rows, replace) => invoke('import_accounts', { rows, replace }),
     deleteAccount: (id) => invoke('delete_account', { id }),
     clearAccounts: () => invoke('clear_accounts'),
     loadSampleData: () => invoke('load_sample_data'),
@@ -144,4 +168,44 @@ export async function exportDsfReport(format = 'xlsx') {
     link.click();
     URL.revokeObjectURL(url);
     return 'Rapport_DSF_SYSCOHADA.csv';
+}
+
+/**
+ * Boîte de dialogue « Ouvrir » pour choisir un fichier de balance.
+ * Retourne le chemin côté Tauri ; en aperçu navigateur, un <input file>
+ * est utilisé et la lecture est faite par `readBalanceFile`.
+ */
+export async function pickBalanceFile() {
+    if (useTauri) {
+        const selected = await openDialog({
+            title: 'Importer une balance (CSV ou Excel)',
+            multiple: false,
+            filters: [
+                { name: 'Fichiers de balance', extensions: ['csv', 'txt', 'tsv', 'xlsx', 'xlsm'] },
+                { name: 'CSV', extensions: ['csv', 'txt', 'tsv'] },
+                { name: 'Excel', extensions: ['xlsx', 'xlsm'] },
+            ],
+        });
+        return typeof selected === 'string' ? selected : null;
+    }
+    return new Promise((resolve) => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.csv,.txt,.tsv,.xlsx';
+        input.onchange = () => resolve(input.files?.[0] ?? null);
+        // Si l'utilisateur annule, aucune résolution : on ajoute un fallback temporel simple.
+        input.click();
+    });
+}
+
+/** Lit un File (aperçu navigateur) en texte UTF-8/latin-1 avec BOM toléré. */
+export async function readFileAsText(file) {
+    const buf = new Uint8Array(await file.arrayBuffer());
+    try {
+        const td = new TextDecoder('utf-8', { fatal: true });
+        return td.decode(buf);
+    } catch {
+        const td = new TextDecoder('windows-1252');
+        return td.decode(buf);
+    }
 }

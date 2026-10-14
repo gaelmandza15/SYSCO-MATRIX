@@ -1,20 +1,21 @@
 import { state, saveSettings } from '../state/store.js';
+import { fiscalYear } from '../lib/format.js';
 import { showToast } from '../ui/toast.js';
 
 export function settingsTemplate() {
     return `
         <div class="bg-white p-6 rounded-2xl border border-neutral-200/80 shadow-sm">
             <h3 class="text-sm font-semibold text-neutral-900 mb-1">Paramètres de l'Entreprise et Règles</h3>
-            <p class="text-xs text-neutral-500 mb-6">Personnalisez les informations de la société et les paramètres de calcul pour l'exercice 2026.</p>
+            <p class="text-xs text-neutral-500 mb-6">Personnalisez les informations de la société et les paramètres de calcul pour l'exercice ${fiscalYear(state.settings.closing_date)}.</p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-xs font-medium text-neutral-700 mb-1.5">Raison Sociale</label>
-                    <input type="text" id="set-company" value="SARL EXEMPLE SYSCOHADA" class="w-full px-3.5 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:border-neutral-400">
+                    <input type="text" id="set-company" placeholder="ex: SARL EXEMPLE SYSCOHADA" class="w-full px-3.5 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:border-neutral-400">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-neutral-700 mb-1.5">N° d'Identification Fiscale (NIF)</label>
-                    <input type="text" id="set-nif" value="M012612345678X" class="w-full px-3.5 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:border-neutral-400">
+                    <input type="text" id="set-nif" placeholder="ex: M012612345678X" class="w-full px-3.5 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:border-neutral-400">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-neutral-700 mb-1.5">Pays (Espace OHADA)</label>
@@ -33,7 +34,7 @@ export function settingsTemplate() {
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-neutral-700 mb-1.5">Exercice clos le</label>
-                    <input type="date" id="set-date" value="2026-12-31" class="w-full px-3.5 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:border-neutral-400">
+                    <input type="date" id="set-date" class="w-full px-3.5 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:border-neutral-400">
                 </div>
             </div>
 
