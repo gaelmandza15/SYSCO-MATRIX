@@ -3,12 +3,11 @@ import './styles/input.css';
 import { appLayout } from './ui/layout.js';
 import { renderIcons } from './ui/icons.js';
 import { switchTab } from './ui/navigation.js';
-import { showToast } from './ui/toast.js';
 
 import * as store from './state/store.js';
 import { fiscalYear, currencyLabel } from './lib/format.js';
 
-import { initDashboard, renderDashboard } from './controllers/dashboard.js';
+import { initDashboard } from './controllers/dashboard.js';
 import { initBalance, renderBalanceTable } from './controllers/balance.js';
 import { initMatrix } from './controllers/matrix.js';
 import { initControls } from './controllers/controls.js';
@@ -39,22 +38,6 @@ function bindGlobalEvents() {
     // Navigation sidebar.
     document.querySelectorAll('[data-nav]').forEach((btn) => {
         btn.addEventListener('click', () => switchTab(btn.getAttribute('data-nav')));
-    });
-
-    // Boutons du header.
-    document.getElementById('btn-sample')?.addEventListener('click', async () => {
-        const accounts = await store.getAccounts();
-        if (accounts.length > 0) {
-            const ok = window.confirm(
-                'Charger la balance témoin remplacera DÉFINITIVEMENT votre balance actuelle ('
-                + accounts.length + ' compte(s)).\n\nContinuer ?'
-            );
-            if (!ok) return;
-        }
-        await store.loadSampleData();
-        renderBalanceTable();
-        renderDashboard();
-        showToast('Balance témoin SYSCOHADA chargée.');
     });
 
     document.getElementById('btn-export')?.addEventListener('click', runExportExcel);

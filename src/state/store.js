@@ -74,11 +74,6 @@ export async function clearAccounts() {
     notify();
 }
 
-export async function loadSampleData() {
-    state.accounts = await dbClient.loadSampleData();
-    notify();
-}
-
 export async function saveSettings(settings) {
     state.settings = { ...settings };
     await dbClient.saveSettings(settings);

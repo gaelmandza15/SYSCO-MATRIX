@@ -40,7 +40,6 @@ pub fn run() {
             commands::import_accounts,
             commands::delete_account,
             commands::clear_accounts,
-            commands::load_sample_data,
             commands::get_settings,
             commands::save_settings,
             commands::export_dsf_report,

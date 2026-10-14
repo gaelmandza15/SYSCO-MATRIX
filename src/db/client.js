@@ -26,26 +26,6 @@ const memoryStore = {
     nextId: 1,
 };
 
-// Balance témoin SYSCOHADA équilibrée (Débit = Crédit = 127 500 000 F).
-// Miroir exact du jeu de données du backend Rust (`commands.rs`).
-const SAMPLE_ACCOUNTS = [
-    ['1011', 'Capital social', 0, 40000000],
-    ['1110', 'Réserve légale', 0, 5000000],
-    ['1610', 'Emprunts et dettes financières', 0, 15000000],
-    ['2210', 'Terrains', 25000000, 0],
-    ['2410', 'Matériel et mobilier', 18000000, 0],
-    ['2821', 'Amortissements des immobilisations', 0, 3000000],
-    ['3110', 'Marchandises', 8000000, 0],
-    ['4110', 'Clients', 14000000, 0],
-    ['4010', "Fournisseurs d'exploitation", 0, 9500000],
-    ['5210', 'Banques', 16000000, 0],
-    ['5710', 'Caisse', 1500000, 0],
-    ['6011', 'Achats de marchandises', 35000000, 0],
-    ['6110', 'Transports', 2000000, 0],
-    ['6610', 'Charges de personnel', 8000000, 0],
-    ['7011', 'Ventes de marchandises', 0, 55000000],
-];
-
 function invokeMemory(cmd, args = {}) {
     const m = memoryStore;
     switch (cmd) {
@@ -80,16 +60,6 @@ function invokeMemory(cmd, args = {}) {
         case 'clear_accounts':
             m.accounts = [];
             return [];
-        case 'load_sample_data':
-            m.accounts = SAMPLE_ACCOUNTS.map(([code, name, debit, credit], i) => ({
-                id: i + 1,
-                code,
-                name,
-                debit,
-                credit,
-            }));
-            m.nextId = m.accounts.length + 1;
-            return [...m.accounts];
         case 'get_settings':
             return { ...m.settings };
         case 'save_settings':
@@ -116,7 +86,6 @@ export const dbClient = {
     importAccounts: (rows, replace) => invoke('import_accounts', { rows, replace }),
     deleteAccount: (id) => invoke('delete_account', { id }),
     clearAccounts: () => invoke('clear_accounts'),
-    loadSampleData: () => invoke('load_sample_data'),
     getSettings: () => invoke('get_settings'),
     saveSettings: (settings) => invoke('save_settings', { settings }),
 };

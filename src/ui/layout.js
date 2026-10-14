@@ -64,10 +64,6 @@ export function appLayout() {
             </div>
 
             <div class="flex items-center space-x-3">
-                <button id="btn-sample" class="px-3.5 py-2 rounded-xl text-xs font-medium bg-neutral-100 text-neutral-700 hover:bg-neutral-200 transition-colors flex items-center space-x-2 border border-neutral-200">
-                    <i data-lucide="database" class="w-3.5 h-3.5"></i>
-                    <span>Charger Balance Témoin</span>
-                </button>
                 <button id="btn-export-pdf" class="px-3.5 py-2 rounded-xl text-xs font-medium bg-neutral-100 text-neutral-700 hover:bg-neutral-200 transition-colors flex items-center space-x-2 border border-neutral-200">
                     <i data-lucide="file-type" class="w-3.5 h-3.5"></i>
                     <span>Exporter PDF</span>
